@@ -8,7 +8,6 @@ export default function InsightsPanel({ refresh, token }) {
     fetch(`${API}/insights`, { headers: { 'Authorization': `Bearer ${token}` }})
       .then(async r => {
         if (!r.ok) {
-          if (r.status === 401) { localStorage.removeItem('token'); location.reload(); return {}; }
           return {};
         }
         return r.json();

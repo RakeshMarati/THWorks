@@ -16,7 +16,6 @@ export default function TimelineChart({ token, refresh, status, priority }) {
     fetch(url, { headers: { 'Authorization': `Bearer ${token}` }})
       .then(async r => {
         if (!r.ok) {
-          if (r.status === 401) { localStorage.removeItem('token'); location.reload(); return { items: [] }; }
           return { items: [] };
         }
         return r.json();

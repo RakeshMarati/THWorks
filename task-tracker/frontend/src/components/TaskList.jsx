@@ -27,7 +27,6 @@ export default function TaskList({ refresh, onChanged, token }) {
     fetch(url, { headers: { 'Authorization': `Bearer ${token}` }})
       .then(async r => {
         if (!r.ok) {
-          if (r.status === 401) { localStorage.removeItem('token'); location.reload(); return { items: [], page: 1, limit, total: 0, pages: 0 }; }
           return { items: [], page: 1, limit, total: 0, pages: 0 };
         }
         return r.json();
@@ -42,7 +41,7 @@ export default function TaskList({ refresh, onChanged, token }) {
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ [field]: value })
     });
-    if (res.status === 401) { localStorage.removeItem('token'); location.reload(); return; }
+    if (res.status === 401) { return; }
     onChanged && onChanged();
   }
 
@@ -52,7 +51,7 @@ export default function TaskList({ refresh, onChanged, token }) {
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify(editValues)
     });
-    if (res.status === 401) { localStorage.removeItem('token'); location.reload(); return; }
+    if (res.status === 401) { return; }
     setEditingId(null);
     onChanged && onChanged();
   }
@@ -62,7 +61,7 @@ export default function TaskList({ refresh, onChanged, token }) {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    if (res.status === 401) { localStorage.removeItem('token'); location.reload(); return; }
+    if (res.status === 401) { return; }
     onChanged && onChanged();
   }
 

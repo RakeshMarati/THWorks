@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 
 export default function App() {
   const [refresh, setRefresh] = useState(false);
-  const [token, setToken] = useState('');
+  const [token, setToken] = useState(() => localStorage.getItem('token') || '');
 
   useEffect(() => {
     const t = localStorage.getItem('token') || '';
