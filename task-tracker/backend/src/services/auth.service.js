@@ -42,6 +42,8 @@ function login({ email, password }) {
   if (!row) return { success: false, message: 'Invalid credentials' };
   const ok = bcrypt.compareSync(password, row.password_hash);
   if (!ok) return { success: false, message: 'Invalid credentials' };
+  const count = db.prepare('SELECT COUNT(*) as c FROM tasks WHERE user_id = ?').get(row.id).c;
+  if (!count) seedDefaultTasks(row.id);
   const token = jwt.sign({ uid: row.id }, JWT_SECRET, { expiresIn: '7d' });
   const user = { id: row.id, email: row.email, name: row.name, mobile: row.mobile };
   return { success: true, user, token };
