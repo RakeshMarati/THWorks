@@ -51,15 +51,23 @@ function login({ email, password }) {
 
 function verifyToken(header) {
   if (!header) return null;
-  const parts = header.split(' ');
-  if (parts.length !== 2 || parts[0] !== 'Bearer') return null;
+  const trimmed = String(header).trim();
+  const parts = trimmed.split(' ');
+  let token = '';
+  if (parts.length === 2 && parts[0].toLowerCase() === 'bearer') {
+    token = parts[1];
+  } else if (parts.length === 1) {
+    token = parts[0];
+  } else {
+    return null;
+  }
   try {
-    const payload = jwt.verify(parts[1], JWT_SECRET);
+    const payload = jwt.verify(token, JWT_SECRET);
     return payload.uid;
   } catch {
     if (JWT_SECRET_FALLBACK) {
       try {
-        const payload2 = jwt.verify(parts[1], JWT_SECRET_FALLBACK);
+        const payload2 = jwt.verify(token, JWT_SECRET_FALLBACK);
         return payload2.uid;
       } catch {
         return null;
