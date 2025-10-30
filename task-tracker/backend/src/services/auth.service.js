@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
+const JWT_SECRET_FALLBACK = process.env.JWT_SECRET_FALLBACK || '';
 
 function register({ email, password, name, mobile }) {
   if (!email || !password || !name) return { success: false, message: 'Name, email and password required' };
@@ -34,6 +35,14 @@ function verifyToken(header) {
     const payload = jwt.verify(parts[1], JWT_SECRET);
     return payload.uid;
   } catch {
+    if (JWT_SECRET_FALLBACK) {
+      try {
+        const payload2 = jwt.verify(parts[1], JWT_SECRET_FALLBACK);
+        return payload2.uid;
+      } catch {
+        return null;
+      }
+    }
     return null;
   }
 }

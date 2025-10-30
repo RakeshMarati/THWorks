@@ -14,12 +14,19 @@ export default function TimelineChart({ token, refresh, status, priority }) {
     if (priority) q.push(`priority=${encodeURIComponent(priority)}`);
     if (q.length) url += '&' + q.join('&');
     fetch(url, { headers: { 'Authorization': `Bearer ${token}` }})
-      .then(r => r.json())
+      .then(async r => {
+        if (!r.ok) {
+          if (r.status === 401) { localStorage.removeItem('token'); location.reload(); return { items: [] }; }
+          return { items: [] };
+        }
+        return r.json();
+      })
       .then(data => {
-        const items = data.items || data;
+        const items = Array.isArray(data.items) ? data.items : Array.isArray(data) ? data : [];
         const dateToCount = new Map();
         items.forEach(t => {
           const d = t.due_date;
+          if (!d) return;
           dateToCount.set(d, (dateToCount.get(d)||0)+1);
         });
         const labels = Array.from(dateToCount.keys()).sort();
@@ -46,6 +53,9 @@ export default function TimelineChart({ token, refresh, status, priority }) {
             }
           }
         });
+      })
+      .catch(() => {
+        if (chartRef.current) chartRef.current.destroy();
       });
     return () => { if (chartRef.current) chartRef.current.destroy(); };
   }, [token, refresh, status, priority]);

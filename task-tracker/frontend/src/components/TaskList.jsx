@@ -25,34 +25,44 @@ export default function TaskList({ refresh, onChanged, token }) {
     q.push(`order=ASC`);
     if (q.length) url += '?' + q.join('&');
     fetch(url, { headers: { 'Authorization': `Bearer ${token}` }})
-      .then(r => r.json())
-      .then(setData);
+      .then(async r => {
+        if (!r.ok) {
+          if (r.status === 401) { localStorage.removeItem('token'); location.reload(); return { items: [], page: 1, limit, total: 0, pages: 0 }; }
+          return { items: [], page: 1, limit, total: 0, pages: 0 };
+        }
+        return r.json();
+      })
+      .then(d => setData(d || { items: [], page: 1, limit, total: 0, pages: 0 }))
+      .catch(() => setData({ items: [], page: 1, limit, total: 0, pages: 0 }));
   }, [refresh, status, priority, page, limit, token]);
 
   async function handleUpdate(id, field, value) {
-    await fetch(`${API}/tasks/` + id, {
+    const res = await fetch(`${API}/tasks/` + id, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ [field]: value })
     });
+    if (res.status === 401) { localStorage.removeItem('token'); location.reload(); return; }
     onChanged && onChanged();
   }
 
   async function handleSave(id) {
-    await fetch(`${API}/tasks/` + id, {
+    const res = await fetch(`${API}/tasks/` + id, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify(editValues)
     });
+    if (res.status === 401) { localStorage.removeItem('token'); location.reload(); return; }
     setEditingId(null);
     onChanged && onChanged();
   }
 
   async function handleDelete(id) {
-    await fetch(`${API}/tasks/` + id, {
+    const res = await fetch(`${API}/tasks/` + id, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });
+    if (res.status === 401) { localStorage.removeItem('token'); location.reload(); return; }
     onChanged && onChanged();
   }
 
@@ -60,6 +70,8 @@ export default function TaskList({ refresh, onChanged, token }) {
     setEditingId(t.id);
     setEditValues({ title: t.title, description: t.description || '', due_date: t.due_date });
   }
+
+  const items = Array.isArray(data.items) ? data.items : [];
 
   return (
     <div className="bg-white p-4 rounded shadow">
@@ -77,7 +89,7 @@ export default function TaskList({ refresh, onChanged, token }) {
           </tr>
         </thead>
         <tbody>
-          {data.items.map(t => (
+          {items.map(t => (
             <tr key={t.id}>
               <td>
                 {editingId === t.id ? (
@@ -129,7 +141,7 @@ export default function TaskList({ refresh, onChanged, token }) {
       </table>
       <div className="flex gap-4" style={{marginTop:'1rem'}}>
         <button onClick={()=> setPage(p => Math.max(1, p-1))} disabled={data.page<=1} className="px-4 py-2">Prev</button>
-        <div style={{alignSelf:'center'}}>Page {data.page} of {data.pages || 1}</div>
+        <div style={{alignSelf:'center'}}>Page {data.pages ? data.page : 1} of {data.pages || 1}</div>
         <button onClick={()=> setPage(p => (data.pages ? Math.min(data.pages, p+1) : p+1))} disabled={data.pages ? data.page>=data.pages : false} className="px-4 py-2">Next</button>
       </div>
     </div>

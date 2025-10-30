@@ -6,8 +6,15 @@ export default function InsightsPanel({ refresh, token }) {
   const [insight, setInsight] = useState({});
   useEffect(() => {
     fetch(`${API}/insights`, { headers: { 'Authorization': `Bearer ${token}` }})
-      .then(r => r.json())
-      .then(setInsight);
+      .then(async r => {
+        if (!r.ok) {
+          if (r.status === 401) { localStorage.removeItem('token'); location.reload(); return {}; }
+          return {};
+        }
+        return r.json();
+      })
+      .then(setInsight)
+      .catch(() => setInsight({}));
   }, [refresh, token]);
   return (
     <div className="bg-yellow-100 text-yellow-900 rounded shadow p-4 text-center">
