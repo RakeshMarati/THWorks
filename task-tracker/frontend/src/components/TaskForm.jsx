@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+const API = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
+
 export default function TaskForm({ onTaskAdded, token }) {
   const [form, setForm] = useState({title: '', description: '', priority: 'Medium', due_date: '', status: 'Open'});
   const [error, setError] = useState('');
@@ -15,7 +17,7 @@ export default function TaskForm({ onTaskAdded, token }) {
       setError('Title, priority, and due date required');
       return;
     }
-    const res = await fetch('http://localhost:3000/tasks', {
+    const res = await fetch(`${API}/tasks`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify(form),

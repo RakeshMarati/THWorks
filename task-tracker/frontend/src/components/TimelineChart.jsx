@@ -1,12 +1,14 @@
 import { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 
+const API = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
+
 export default function TimelineChart({ token, refresh, status, priority }) {
   const canvasRef = useRef(null);
   const chartRef = useRef(null);
 
   useEffect(() => {
-    let url = 'http://localhost:3000/tasks?limit=1000&sort_by=due_date&order=ASC';
+    let url = `${API}/tasks?limit=1000&sort_by=due_date&order=ASC`;
     const q = [];
     if (status) q.push(`status=${encodeURIComponent(status)}`);
     if (priority) q.push(`priority=${encodeURIComponent(priority)}`);

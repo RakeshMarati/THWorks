@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 
+const API = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
+
 export default function InsightsPanel({ refresh, token }) {
   const [insight, setInsight] = useState({});
   useEffect(() => {
-    fetch('http://localhost:3000/insights', { headers: { 'Authorization': `Bearer ${token}` }})
+    fetch(`${API}/insights`, { headers: { 'Authorization': `Bearer ${token}` }})
       .then(r => r.json())
       .then(setInsight);
   }, [refresh, token]);

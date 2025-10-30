@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+const API = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
+
 const statusList = ['Open', 'In Progress', 'Done'];
 const priorityList = ['Low', 'Medium', 'High'];
 
@@ -13,7 +15,7 @@ export default function TaskList({ refresh, onChanged, token }) {
   const [editValues, setEditValues] = useState({ title: '', description: '', due_date: '' });
 
   useEffect(() => {
-    let url = 'http://localhost:3000/tasks';
+    let url = `${API}/tasks`;
     const q = [];
     if (status) q.push(`status=${encodeURIComponent(status)}`);
     if (priority) q.push(`priority=${encodeURIComponent(priority)}`);
@@ -28,7 +30,7 @@ export default function TaskList({ refresh, onChanged, token }) {
   }, [refresh, status, priority, page, limit, token]);
 
   async function handleUpdate(id, field, value) {
-    await fetch('http://localhost:3000/tasks/' + id, {
+    await fetch(`${API}/tasks/` + id, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ [field]: value })
@@ -37,7 +39,7 @@ export default function TaskList({ refresh, onChanged, token }) {
   }
 
   async function handleSave(id) {
-    await fetch('http://localhost:3000/tasks/' + id, {
+    await fetch(`${API}/tasks/` + id, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify(editValues)
@@ -47,7 +49,7 @@ export default function TaskList({ refresh, onChanged, token }) {
   }
 
   async function handleDelete(id) {
-    await fetch('http://localhost:3000/tasks/' + id, {
+    await fetch(`${API}/tasks/` + id, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` }
     });
