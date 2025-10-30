@@ -1,0 +1,7 @@
+node_modules/
+*.log
+.DS_Store
+.env
+
+task-tracker/backend/task_tracker.db
+task-tracker/frontend/dist/

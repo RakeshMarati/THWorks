@@ -1,0 +1,1 @@
+SQLite was selected for its speed and portability. The tasks schema is normalized for minimal redundancy and query speed, with proper enums and date fields for filtering. The insight service uses aggregation and simple rules to create readable workload analysis for the user, matching assignment requirements.
