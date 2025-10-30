@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+const API = import.meta.env.VITE_API_BASE || 'http://localhost:3000';
+
 export default function AuthForm({ onAuth }) {
   const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
@@ -14,7 +16,7 @@ export default function AuthForm({ onAuth }) {
     setError('');
     setInfo('');
     const payload = mode === 'register' ? { email, password, name, mobile } : { email, password };
-    const res = await fetch(`http://localhost:3000/auth/${mode}`, {
+    const res = await fetch(`${API}/auth/${mode}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
